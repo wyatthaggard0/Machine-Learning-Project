@@ -201,7 +201,7 @@ export default function Dashboard() {
 
       {/* ── Live demo ─────────────────────────────────────────────── */}
       {scenarios.length > 0 && (
-        <Section title="See It In Action — Score a Transaction">
+        <Section title="Live Deployments">
           <p className="text-gray-400 text-sm mb-5 leading-relaxed max-w-2xl">
             Select any transaction below to see how the model scores it. These
             are representative examples from the test dataset — transactions the
