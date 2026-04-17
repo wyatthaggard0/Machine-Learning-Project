@@ -1,0 +1,13 @@
+{
+  "model_name": "Ridge Logistic Regression (L2)",
+  "best_params": {
+    "C": 10.0
+  },
+  "n_features_used": 30,
+  "n_train": 15576,
+  "n_test": 2000,
+  "dataset": "IEEE-CIS Fraud Detection",
+  "smote_applied": true,
+  "cv_folds": 5,
+  "cv_auc": 0.8113
+}

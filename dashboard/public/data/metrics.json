@@ -1,0 +1,20 @@
+{
+  "loss_prevented": 6494.84,
+  "missed_loss": 2595.62,
+  "false_alarm_value": 74941.55,
+  "total_fraud_value": 9090.46,
+  "pct_prevented": 71.4,
+  "roc_auc": 0.81,
+  "avg_precision": 0.2808,
+  "f1_fraud": 0.1285,
+  "precision_fraud": 0.0704,
+  "recall_fraud": 0.7358,
+  "balanced_accuracy": 0.7357,
+  "mcc": 0.1692,
+  "best_threshold": 0.436,
+  "n_fraud_caught": 39,
+  "n_fraud_missed": 14,
+  "n_false_alarms": 515,
+  "n_test": 2000,
+  "fraud_rate_pct": 2.65
+}

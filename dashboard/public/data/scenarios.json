@@ -1,0 +1,72 @@
+[
+  {
+    "id": "txn-1",
+    "title": "Regular Amazon Purchase",
+    "amount": "$68.50",
+    "time": "2:00 PM • Weekday",
+    "fraud_probability": 0.04,
+    "risk_level": "SAFE",
+    "key_signals": [
+      "Billing address matches bank records",
+      "Amount within normal range for this card",
+      "No unusual behavioral signals detected"
+    ],
+    "features": null
+  },
+  {
+    "id": "txn-2",
+    "title": "Suspicious Late-Night Electronics",
+    "amount": "$1,247.00",
+    "time": "3:12 AM • Weekend",
+    "fraud_probability": 0.89,
+    "risk_level": "FLAGGED",
+    "key_signals": [
+      "Billing address does not match bank record",
+      "Amount far exceeds this card's typical purchases",
+      "Transaction at unusual hour (3 AM)"
+    ],
+    "features": null
+  },
+  {
+    "id": "txn-3",
+    "title": "Morning Coffee Shop",
+    "amount": "$4.75",
+    "time": "8:15 AM • Weekday",
+    "fraud_probability": 0.02,
+    "risk_level": "SAFE",
+    "key_signals": [
+      "Small, routine purchase amount",
+      "Normal business hours",
+      "Established card with consistent history"
+    ],
+    "features": null
+  },
+  {
+    "id": "txn-4",
+    "title": "High-Risk: Multiple Addresses",
+    "amount": "$340.00",
+    "time": "11:58 PM • Weekend",
+    "fraud_probability": 0.94,
+    "risk_level": "FLAGGED",
+    "key_signals": [
+      "7 different billing addresses linked to this card",
+      "18 transactions tied to this email address recently",
+      "Gift card purchase — high-risk transaction type"
+    ],
+    "features": null
+  },
+  {
+    "id": "txn-5",
+    "title": "New Online Subscription",
+    "amount": "$149.99",
+    "time": "6:30 PM • Weekend",
+    "fraud_probability": 0.29,
+    "risk_level": "REVIEW",
+    "key_signals": [
+      "First transaction with this merchant",
+      "Amount is within normal range for this card",
+      "Email address used in several recent transactions"
+    ],
+    "features": null
+  }
+]
