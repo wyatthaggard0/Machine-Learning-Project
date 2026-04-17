@@ -24,12 +24,17 @@ export async function POST(request) {
     const { SageMakerRuntimeClient, InvokeEndpointCommand } =
       await import("@aws-sdk/client-sagemaker-runtime")
 
+    const credentials = {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    }
+    if (process.env.AWS_SESSION_TOKEN) {
+      credentials.sessionToken = process.env.AWS_SESSION_TOKEN
+    }
+
     const client = new SageMakerRuntimeClient({
       region: process.env.AWS_REGION || "us-east-1",
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-      },
+      credentials,
     })
 
     const command = new InvokeEndpointCommand({
