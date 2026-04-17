@@ -244,6 +244,9 @@ export default function Dashboard() {
                 {/* Gauge */}
                 <div className="flex justify-center">
                   <FraudGauge value={liveResult?.fraud_probability ?? selected.fraud_probability} />
+                  {liveResult && !liveResult.error && (
+                    <p className="text-xs text-[#2ecc71] mt-2 text-center">Live AWS result</p>
+                  )}
                 </div>
 
                 {/* Key signals */}

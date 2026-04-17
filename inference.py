@@ -17,14 +17,11 @@ def input_fn(request_body, request_content_type):
 
 
 def predict_fn(input_data, model):
-    imputer = model["imputer"]
-    scaler = model["scaler"]
     clf = model["model"]
     threshold = model["threshold"]
 
-    X = imputer.transform(input_data)
-    X = scaler.transform(X)
-    prob = float(clf.predict_proba(X)[0, 1])
+    # Features arrive pre-standardized from the dashboard
+    prob = float(clf.predict_proba(input_data)[0, 1])
 
     return {
         "fraud_probability": round(prob, 4),

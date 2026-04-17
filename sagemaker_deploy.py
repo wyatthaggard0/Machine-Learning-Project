@@ -157,7 +157,7 @@ for i, (idx, (risk, title_prefix)) in enumerate(
         "fraud_probability": round(prob, 4),
         "risk_level":       risk,
         "key_signals":      signals[:3],
-        "features":         X_test.iloc[idx].values.tolist(),
+        "features":         X_test_std[idx].tolist(),
         "feature_names":    feature_names,
     })
 
