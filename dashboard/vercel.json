@@ -2,12 +2,5 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install",
-  "env": {
-    "SAGEMAKER_ENDPOINT_NAME": "@sagemaker-endpoint-name",
-    "AWS_REGION": "@aws-region",
-    "AWS_ACCESS_KEY_ID": "@aws-access-key-id",
-    "AWS_SECRET_ACCESS_KEY": "@aws-secret-access-key",
-    "AWS_SESSION_TOKEN": "@aws-session-token"
-  }
+  "installCommand": "npm install"
 }
