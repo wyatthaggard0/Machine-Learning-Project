@@ -214,8 +214,9 @@ export default function Dashboard() {
   }
 
   const fraudPieData = [
-    { name: "Caught", value: metrics.loss_prevented, fill: "#059669" },
-    { name: "Missed", value: metrics.missed_loss,    fill: "#e5e7eb" },
+    { name: "Caught",        value: metrics.loss_prevented,    fill: "#059669" },
+    { name: "Missed",        value: metrics.missed_loss,       fill: "#dc2626" },
+    { name: "False alarm $", value: metrics.false_alarm_value, fill: "#d97706" },
   ]
 
   return (
