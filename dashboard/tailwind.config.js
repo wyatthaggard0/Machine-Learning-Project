@@ -4,23 +4,26 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        mono: ['"JetBrains Mono"', '"IBM Plex Mono"', '"Consolas"', '"Courier New"', "monospace"],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
       },
       colors: {
-        // Bloomberg-style palette
-        term: {
-          bg:      "#0a0a0a",   // near-black background
-          panel:   "#111111",   // panel background
-          border:  "#1f1f1f",   // panel border
-          rule:    "#2a2a2a",   // gridlines / rules
-          amber:   "#ffaa00",   // primary accent (Bloomberg orange/amber)
-          amberDim:"#995f00",
-          green:   "#00d97e",   // up / positive
-          red:     "#ff3344",   // down / negative
-          cyan:    "#00b8d4",   // info
-          text:    "#e8e8e8",   // primary text
-          muted:   "#888888",   // secondary text
-          dim:     "#555555",   // tertiary text
+        // Databox-inspired forest-green palette
+        db: {
+          bg:     "#0e3a2c",   // page background — deep forest
+          panel:  "#1d5742",   // card / panel — slightly lighter forest
+          panel2: "#164534",   // alternate panel
+          border: "#2a7257",   // soft border
+          rule:   "#2a7257",   // dividers
+          orange: "#ff6a13",   // primary accent (Databox orange)
+          orangeSoft: "rgba(255,106,19,0.18)",
+          amber:  "#ffa84a",   // soft accent
+          green:  "#22c773",   // up / positive
+          greenSoft: "rgba(34,199,115,0.2)",
+          red:    "#ff5d5d",   // down / negative
+          redSoft: "rgba(255,93,93,0.2)",
+          text:   "#ffffff",   // primary text
+          muted:  "#bfd6cb",   // secondary text
+          dim:    "#80a194",   // tertiary text
         },
       },
     },
