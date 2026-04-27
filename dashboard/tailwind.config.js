@@ -4,26 +4,23 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'sans-serif'],
+        sans:  ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        mono:  ['"JetBrains Mono"', 'Consolas', 'monospace'],
       },
       colors: {
-        // Databox-inspired forest-green palette
-        db: {
-          bg:     "#0e3a2c",   // page background — deep forest
-          panel:  "#1d5742",   // card / panel — slightly lighter forest
-          panel2: "#164534",   // alternate panel
-          border: "#2a7257",   // soft border
-          rule:   "#2a7257",   // dividers
-          orange: "#ff6a13",   // primary accent (Databox orange)
-          orangeSoft: "rgba(255,106,19,0.18)",
-          amber:  "#ffa84a",   // soft accent
-          green:  "#22c773",   // up / positive
-          greenSoft: "rgba(34,199,115,0.2)",
-          red:    "#ff5d5d",   // down / negative
-          redSoft: "rgba(255,93,93,0.2)",
-          text:   "#ffffff",   // primary text
-          muted:  "#bfd6cb",   // secondary text
-          dim:    "#80a194",   // tertiary text
+        ink: {
+          paper:  "#f5f1e8",   // warm off-white background
+          card:   "#fffdf8",   // card surface
+          rule:   "#d4cab1",   // hairline borders
+          navy:   "#0b2545",   // deep navy — primary text & accents
+          ink:    "#13315c",   // mid-navy — body emphasis
+          coral:  "#e63946",   // alert / fraud-pushing accent
+          sage:   "#588157",   // safe / non-fraud accent
+          gold:   "#c9a227",   // highlight / featured
+          mute:   "#6c757d",   // secondary text
+          dim:    "#a0978a",   // tertiary text
+          tint:   "#ebe5d6",   // muted background panel
         },
       },
     },
