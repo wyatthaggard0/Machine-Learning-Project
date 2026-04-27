@@ -4,24 +4,22 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans:  ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        serif: ['"Playfair Display"', 'Georgia', 'serif'],
-        mono:  ['"JetBrains Mono"', 'Consolas', 'monospace'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
       },
       colors: {
-        ink: {
-          paper:  "#f5f1e8",   // warm off-white background
-          card:   "#fffdf8",   // card surface
-          rule:   "#d4cab1",   // hairline borders
-          navy:   "#0b2545",   // deep navy — primary text & accents
-          ink:    "#13315c",   // mid-navy — body emphasis
-          coral:  "#e63946",   // alert / fraud-pushing accent
-          sage:   "#588157",   // safe / non-fraud accent
-          gold:   "#c9a227",   // highlight / featured
-          mute:   "#6c757d",   // secondary text
-          dim:    "#a0978a",   // tertiary text
-          tint:   "#ebe5d6",   // muted background panel
-        },
+        bg:        "#f7f8fa",
+        card:      "#ffffff",
+        border:    "#e5e7eb",
+        rule:      "#eef0f3",
+        ink:       "#1a1f2e",   // primary text
+        body:      "#4b5563",   // body text
+        muted:     "#6b7280",   // labels
+        dim:       "#9ca3af",   // faint
+        accent:    "#2563eb",   // primary blue accent
+        accentSoft:"#dbeafe",
+        good:      "#059669",   // green / safe
+        warn:      "#d97706",   // amber / review
+        bad:       "#dc2626",   // red / fraud
       },
     },
   },

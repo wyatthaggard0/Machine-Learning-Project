@@ -1,8 +1,8 @@
 import "./globals.css"
 
 export const metadata = {
-  title: "The Fraud Ledger · Model Brief",
-  description: "IEEE-CIS Credit Card Fraud Detection · Editorial Banker Brief",
+  title: "Fraud Detection Dashboard",
+  description: "IEEE-CIS Credit Card Fraud Detection",
 }
 
 export default function RootLayout({ children }) {
