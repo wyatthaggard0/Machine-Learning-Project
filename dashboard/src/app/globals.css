@@ -2,7 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  background-color: #1a1a2e;
-  color: #e0e0e0;
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+html, body {
+  background-color: #0a0a0a;
+  color: #e8e8e8;
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', Consolas, 'Courier New', monospace;
+  font-feature-settings: "tnum" 1, "zero" 1;
+  letter-spacing: 0;
+}
+
+/* Scanline / CRT subtle texture */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(255,170,0,0.012) 0px,
+    rgba(255,170,0,0.012) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  z-index: 1;
+}
+
+/* Sharp scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0a0a0a; }
+::-webkit-scrollbar-thumb { background: #2a2a2a; }
+::-webkit-scrollbar-thumb:hover { background: #ffaa00; }
+
+/* Blinking caret for terminal feel */
+@keyframes caret {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.caret::after {
+  content: "_";
+  color: #ffaa00;
+  animation: caret 1s steps(1) infinite;
+  margin-left: 2px;
+}
+
+/* Ticker scroll animation */
+@keyframes ticker {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: ticker 60s linear infinite;
+  display: inline-flex;
+  white-space: nowrap;
 }

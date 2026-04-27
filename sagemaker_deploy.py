@@ -41,12 +41,18 @@ print("✓ S3 bucket cleared")
 
 # ── Save model pipeline ───────────────────────────────────────────────────────
 os.makedirs("model", exist_ok=True)
+# Prefer the rubric-completion tuned model if it was trained; otherwise fall back
+# to the original best model from the notebook.
+deploy_model = globals().get("tuned_model", None) or final_model
+deploy_threshold = 0.5 if "tuned_model" in globals() else float(best_thresh)
+print(f"Deploying model: {type(deploy_model).__name__}")
+
 artifacts = {
     "imputer":       imputer,
     "scaler":        scaler_std,
-    "model":         final_model,
+    "model":         deploy_model,
     "feature_names": feature_names,
-    "threshold":     float(best_thresh),
+    "threshold":     deploy_threshold,
 }
 joblib.dump(artifacts, "model/pipeline.joblib")
 

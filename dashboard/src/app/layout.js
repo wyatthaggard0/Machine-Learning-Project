@@ -1,8 +1,8 @@
 import "./globals.css"
 
 export const metadata = {
-  title: "Fraud Detection Dashboard",
-  description: "Machine learning model results for IEEE-CIS credit card fraud detection",
+  title: "FRAUD.MODEL · TERMINAL",
+  description: "IEEE-CIS Credit Card Fraud Detection · Real-time scoring terminal",
 }
 
 export default function RootLayout({ children }) {

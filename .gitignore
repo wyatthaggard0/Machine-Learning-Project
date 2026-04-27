@@ -5,6 +5,9 @@ dashboard/.next/
 *.joblib
 model/
 model.tar.gz
+pipeline_finetuned.joblib
+shap_explainer.joblib
+finalized_fraud_model.tar.gz
 __pycache__/
 .ipynb_checkpoints/
 .env
