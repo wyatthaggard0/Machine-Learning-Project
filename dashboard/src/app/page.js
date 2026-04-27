@@ -213,10 +213,12 @@ export default function Dashboard() {
     )
   }
 
+  // Donut shows only fraud caught vs missed (which sum to total fraud).
+  // False alarms are a separate concept (legitimate $ wrongly blocked) and
+  // appear in the side legend only — including them would distort the chart.
   const fraudPieData = [
-    { name: "Caught",        value: metrics.loss_prevented,    fill: "#059669" },
-    { name: "Missed",        value: metrics.missed_loss,       fill: "#dc2626" },
-    { name: "False alarm $", value: metrics.false_alarm_value, fill: "#d97706" },
+    { name: "Caught", value: metrics.loss_prevented, fill: "#059669" },
+    { name: "Missed", value: metrics.missed_loss,    fill: "#dc2626" },
   ]
 
   return (
