@@ -59,6 +59,10 @@ joblib.dump(artifacts, "model/pipeline.joblib")
 filename = "finalized_fraud_model.tar.gz"
 with tarfile.open(filename, "w:gz") as tar:
     tar.add("model/pipeline.joblib", arcname="pipeline.joblib")
+    # Bundle the SHAP explainer if it exists so the endpoint can return live SHAP
+    if os.path.exists("shap_explainer.joblib"):
+        tar.add("shap_explainer.joblib", arcname="shap_explainer.joblib")
+        print("✓ shap_explainer.joblib bundled")
 print(f"✓ {filename} created")
 
 # ── Write requirements.txt ────────────────────────────────────────────────────
@@ -67,6 +71,7 @@ with open("requirements.txt", "w") as f:
     f.write("scipy==1.12.0\n")
     f.write("scikit-learn==1.3.2\n")
     f.write("pandas==2.2.0\n")
+    f.write("shap>=0.43,<0.46\n")
     f.write("imbalanced-learn==0.12.0\n")
 print("✓ requirements.txt written")
 

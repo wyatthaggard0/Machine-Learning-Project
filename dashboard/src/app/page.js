@@ -160,6 +160,271 @@ function ShapForcePlot({ contributions, baseValue, finalValue }) {
   )
 }
 
+/* ─── Build-Your-Own form ────────────────────────────────────────── */
+
+// LabelEncoder applies alphabetical order by default. These mappings assume
+// that — they line up with the encoded ints used during training.
+const PRODUCT_OPTIONS = [
+  { label: "Product W (most common — web purchase)", encoded: 4 },
+  { label: "Product C (consumer goods)",              encoded: 0 },
+  { label: "Product H (high-value)",                  encoded: 1 },
+  { label: "Product R (recurring)",                   encoded: 2 },
+  { label: "Product S (subscription)",                encoded: 3 },
+]
+const CARDTYPE_OPTIONS = [
+  { label: "Credit",  encoded: 0 },
+  { label: "Debit",   encoded: 1 },
+]
+const REGION_OPTIONS = [
+  { label: "Domestic (US)",      encoded: 150 },
+  { label: "International",      encoded: 185 },
+]
+const M6_OPTIONS = [
+  { label: "Yes — billing matches bank record",  encoded: 1 },
+  { label: "No — billing does not match",        encoded: 0 },
+]
+
+// Friendly descriptions for the live SHAP plot (the endpoint only sends names)
+const FEATURE_DESCRIPTIONS = {
+  ProductCD: "Type of product purchased",
+  card3:     "Card billing region",
+  card6:     "Card type (debit / credit)",
+  C7:        "Number of addresses linked to the card",
+  C8:        "Transactions sharing this email",
+  C12:       "Transactions from same device",
+  M6:        "Billing address matches bank record",
+}
+
+function FormRow({ label, sub, children }) {
+  return (
+    <div className="grid grid-cols-12 items-center gap-3 py-2">
+      <div className="col-span-12 sm:col-span-5">
+        <div className="text-[12px] font-medium text-[#1a1f2e]">{label}</div>
+        {sub && <div className="text-[11px] text-[#9ca3af]">{sub}</div>}
+      </div>
+      <div className="col-span-12 sm:col-span-7">{children}</div>
+    </div>
+  )
+}
+
+function BuildYourOwn({ scalerStats, onResult }) {
+  const [productCD, setProductCD]   = useState(4)        // W
+  const [cardType,  setCardType]    = useState(0)        // credit
+  const [region,    setRegion]      = useState(150)      // domestic
+  const [c7,        setC7]          = useState(1)        // 1 address
+  const [c8,        setC8]          = useState(1)        // 1 email tx
+  const [c12,       setC12]         = useState(1)        // 1 device tx
+  const [m6,        setM6]          = useState(1)        // billing matches
+  const [loading,   setLoading]     = useState(false)
+  const [result,    setResult]      = useState(null)
+  const [error,     setError]       = useState(null)
+
+  const z = (raw, idx) => {
+    if (!scalerStats) return 0
+    const m = scalerStats.means?.[idx] ?? 0
+    const s = scalerStats.stds?.[idx]  ?? 1
+    return (raw - m) / (s || 1)
+  }
+
+  const buildFeatureVector = useCallback(() => {
+    if (!scalerStats) return Array(30).fill(0)
+    // 30-element vector matching feature_names order. Indexes 0–6 are the
+    // interpretable features the user sets; 7–29 (V-features) default to 0
+    // (= training mean in z-space, i.e. "typical").
+    const vec = Array(30).fill(0)
+    vec[0] = z(productCD, 0)   // ProductCD
+    vec[1] = z(region,    1)   // card3
+    vec[2] = z(cardType,  2)   // card6
+    vec[3] = z(c7,        3)   // C7
+    vec[4] = z(c8,        4)   // C8
+    vec[5] = z(c12,       5)   // C12
+    vec[6] = z(m6,        6)   // M6
+    return vec
+  }, [scalerStats, productCD, region, cardType, c7, c8, c12, m6])
+
+  const handleScore = async () => {
+    setLoading(true)
+    setError(null)
+    setResult(null)
+    try {
+      const features = buildFeatureVector()
+      const res = await fetch("/api/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ features }),
+      })
+      const data = await res.json()
+      if (data.error) {
+        setError(data.error)
+      } else {
+        const enriched = {
+          ...data,
+          shap_contributions: (data.shap_contributions || []).map(c => ({
+            ...c,
+            description: FEATURE_DESCRIPTIONS[c.feature] || "Anonymized fraud signal",
+          })),
+        }
+        setResult(enriched)
+        onResult?.(enriched)
+      }
+    } catch {
+      setError("Could not reach live endpoint")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const Select = ({ value, setter, options }) => (
+    <select
+      value={value}
+      onChange={e => setter(Number(e.target.value))}
+      className="w-full bg-white border border-[#e5e7eb] rounded-md px-3 py-1.5 text-[13px] text-[#1a1f2e] focus:outline-none focus:border-[#2563eb]"
+    >
+      {options.map(o => (
+        <option key={o.encoded} value={o.encoded}>{o.label}</option>
+      ))}
+    </select>
+  )
+
+  const Slider = ({ value, setter, min, max, suffix }) => (
+    <div className="flex items-center gap-3">
+      <input
+        type="range" min={min} max={max} value={value}
+        onChange={e => setter(Number(e.target.value))}
+        className="flex-1 accent-[#2563eb]"
+      />
+      <span className="text-[12px] tabular-nums text-[#1a1f2e] w-12 text-right">
+        {value}{suffix ? ` ${suffix}` : ""}
+      </span>
+    </div>
+  )
+
+  return (
+    <div>
+      <div className="grid grid-cols-12 gap-6">
+        {/* Form */}
+        <div className="col-span-12 lg:col-span-7">
+          <div className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider mb-2">
+            Transaction Inputs
+          </div>
+          <div className="divide-y divide-[#eef0f3]">
+            <FormRow label="Product type"
+                     sub="What kind of purchase">
+              <Select value={productCD} setter={setProductCD} options={PRODUCT_OPTIONS} />
+            </FormRow>
+            <FormRow label="Card type">
+              <Select value={cardType} setter={setCardType} options={CARDTYPE_OPTIONS} />
+            </FormRow>
+            <FormRow label="Card region">
+              <Select value={region} setter={setRegion} options={REGION_OPTIONS} />
+            </FormRow>
+            <FormRow label="Addresses linked to card"
+                     sub="Multiple addresses on one card raises risk">
+              <Slider value={c7} setter={setC7} min={1} max={10} />
+            </FormRow>
+            <FormRow label="Transactions sharing this email"
+                     sub="In recent activity window">
+              <Slider value={c8} setter={setC8} min={1} max={30} />
+            </FormRow>
+            <FormRow label="Transactions from same device"
+                     sub="Higher counts = more shared device use">
+              <Slider value={c12} setter={setC12} min={1} max={30} />
+            </FormRow>
+            <FormRow label="Billing address matches bank record">
+              <Select value={m6} setter={setM6} options={M6_OPTIONS} />
+            </FormRow>
+          </div>
+
+          <button
+            onClick={handleScore}
+            disabled={loading}
+            className="mt-5 w-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-medium py-2.5 px-4 rounded-md text-[13px] disabled:opacity-50 transition-colors"
+          >
+            {loading ? "Scoring…" : "Run Prediction"}
+          </button>
+          {error && (
+            <p className="text-[11px] text-[#dc2626] mt-2">{error}</p>
+          )}
+          {!scalerStats?.means && (
+            <p className="text-[11px] text-[#d97706] mt-2 italic">
+              Using placeholder scaling stats. Run rubric_completion.py to export real training stats.
+            </p>
+          )}
+        </div>
+
+        {/* Result */}
+        <div className="col-span-12 lg:col-span-5">
+          <div className="text-[11px] font-semibold text-[#6b7280] uppercase tracking-wider mb-2">
+            Live Prediction
+          </div>
+          {result ? (
+            <div className="flex flex-col items-center">
+              {(() => {
+                const p = result.fraud_probability
+                const pct = Math.round(p * 100)
+                const color = p >= 0.5 ? "#dc2626" : p >= 0.25 ? "#d97706" : "#059669"
+                const level = p >= 0.5 ? "FLAGGED" : p >= 0.25 ? "REVIEW" : "SAFE"
+                return (
+                  <>
+                    <div className="relative w-36 h-36">
+                      <svg viewBox="0 0 120 120" className="w-full h-full -rotate-90">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="#eef0f3" strokeWidth="10" />
+                        <circle cx="60" cy="60" r="50" fill="none"
+                          stroke={color} strokeWidth="10"
+                          strokeDasharray={`${pct * 3.142} 314.2`}
+                          strokeLinecap="round"
+                          style={{ transition: "stroke-dasharray 0.6s ease" }}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-3xl font-semibold tabular-nums" style={{ color }}>{pct}%</span>
+                        <span className="text-[10px] text-[#9ca3af] uppercase tracking-wider">fraud risk</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider"
+                         style={{ background: `${color}1a`, color }}>
+                      {level}
+                    </div>
+                    <div className="text-[11px] text-[#059669] mt-3">● Live AWS result</div>
+                  </>
+                )
+              })()}
+            </div>
+          ) : (
+            <div className="bg-[#f7f8fa] rounded-md p-6 text-center text-[12px] text-[#6b7280]">
+              Set your inputs and click <span className="font-semibold">Run Prediction</span>.<br />
+              The live SageMaker endpoint will return a fraud score and a SHAP breakdown.
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* SHAP plot from live response */}
+      {result?.shap_contributions?.length > 0 && result.shap_base_value !== undefined && (
+        <div className="mt-8 pt-6 border-t border-[#eef0f3]">
+          <div className="flex items-baseline justify-between mb-4">
+            <h4 className="text-[13px] font-semibold text-[#1a1f2e]">SHAP — Why this score?</h4>
+            <span className="text-[11px] text-[#6b7280]">
+              <span className="text-[#dc2626]">Red</span> = pushes toward fraud,
+              <span className="text-[#2563eb]"> blue</span> = away
+            </span>
+          </div>
+          <ShapForcePlot
+            contributions={result.shap_contributions}
+            baseValue={result.shap_base_value}
+            finalValue={result.fraud_probability}
+          />
+          {result.shap_error && (
+            <p className="text-[11px] text-[#d97706] mt-3 italic">
+              SHAP not available on the endpoint: {result.shap_error}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
 /* ─── Page ───────────────────────────────────────────────────────── */
 
 export default function Dashboard() {
@@ -167,15 +432,18 @@ export default function Dashboard() {
   const [features,   setFeatures]   = useState([])
   const [summary,    setSummary]    = useState(null)
   const [scenarios,  setScenarios]  = useState([])
+  const [scalerStats, setScalerStats] = useState(null)
   const [selected,   setSelected]   = useState(null)
   const [liveResult, setLiveResult] = useState(null)
   const [liveLoading, setLiveLoading] = useState(false)
+  const [customMode, setCustomMode] = useState(false)
 
   useEffect(() => {
     fetch("/data/metrics.json").then(r => r.json()).then(setMetrics)
     fetch("/data/top_features.json").then(r => r.json()).then(setFeatures)
     fetch("/data/summary.json").then(r => r.json()).then(setSummary)
     fetch("/data/scenarios.json").then(r => r.json()).then(setScenarios)
+    fetch("/data/scaler_stats.json").then(r => r.json()).then(setScalerStats).catch(() => {})
   }, [])
 
   useEffect(() => {
@@ -349,19 +617,19 @@ export default function Dashboard() {
         {/* Row 3: Live transaction scanner */}
         <Card title="Score a Transaction" className="mb-6">
           <p className="text-[12px] text-[#6b7280] mb-4">
-            Pick a sample test transaction to see how the model scores it.
+            Pick a sample transaction below, or use <span className="font-semibold">Build Your Own</span> to set the inputs yourself.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
             {scenarios.map(s => {
-              const isActive = selected?.id === s.id
+              const isActive = !customMode && selected?.id === s.id
               const color =
                 s.risk_level === "FLAGGED" ? "#dc2626" :
                 s.risk_level === "REVIEW"  ? "#d97706" : "#059669"
               return (
                 <button
                   key={s.id}
-                  onClick={() => { setSelected(s); setLiveResult(null) }}
+                  onClick={() => { setSelected(s); setLiveResult(null); setCustomMode(false) }}
                   className={`text-left rounded-lg p-4 border transition-all ${
                     isActive
                       ? "border-[#2563eb] ring-1 ring-[#2563eb] bg-[#f0f6ff]"
@@ -382,9 +650,37 @@ export default function Dashboard() {
                 </button>
               )
             })}
+
+            {/* Build Your Own tile */}
+            <button
+              onClick={() => { setCustomMode(true); setSelected(null); setLiveResult(null) }}
+              className={`text-left rounded-lg p-4 border-2 border-dashed transition-all ${
+                customMode
+                  ? "border-[#2563eb] ring-1 ring-[#2563eb] bg-[#f0f6ff]"
+                  : "border-[#cbd5e1] bg-white hover:border-[#2563eb]"
+              }`}
+            >
+              <div className="flex items-center gap-1.5 mb-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2563eb]" />
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#2563eb]">
+                  Customize
+                </span>
+              </div>
+              <div className="text-[13px] font-medium text-[#1a1f2e] leading-snug mb-2">
+                Build Your Own
+              </div>
+              <div className="text-[18px] font-semibold text-[#2563eb]">+</div>
+              <div className="text-[11px] text-[#9ca3af] mt-0.5">Set the inputs</div>
+            </button>
           </div>
 
-          {selected && (
+          {customMode && (
+            <div className="border-t border-[#eef0f3] pt-6">
+              <BuildYourOwn scalerStats={scalerStats} />
+            </div>
+          )}
+
+          {!customMode && selected && (
             <div className="border-t border-[#eef0f3] pt-6">
               <div className="grid grid-cols-12 gap-6">
 

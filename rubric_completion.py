@@ -484,6 +484,16 @@ with open(f"{DASHBOARD_DATA}/summary.json", "w") as f:
     json.dump(summary_export, f, indent=2)
 print("  ✓ summary.json")
 
+# scaler_stats.json — for client-side z-score computation in "Build Your Own"
+scaler_stats = {
+    "feature_names": feature_names,
+    "means":         scaler_std.mean_.tolist(),
+    "stds":          scaler_std.scale_.tolist(),
+}
+with open(f"{DASHBOARD_DATA}/scaler_stats.json", "w") as f:
+    json.dump(scaler_stats, f, indent=2)
+print("  ✓ scaler_stats.json (for build-your-own form)")
+
 # ──────────────────────────────────────────────────────────────────────
 print("\n" + "=" * 70)
 print("  ✓ MILESTONE 4 COMPLETE — RUBRIC ITEMS COVERED")
