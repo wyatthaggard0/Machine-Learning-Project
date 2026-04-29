@@ -2,83 +2,6 @@
   {
     "id": "txn-1",
     "title": "High-Risk Transaction #1",
-    "amount": "$83.74",
-    "time": "2:00 AM \u2022 Weekday",
-    "fraud_probability": 1.0,
-    "risk_level": "FLAGGED",
-    "key_signals": [
-      "5 different billing addresses on file",
-      "24 transactions linked to this email",
-      "Transaction at an unusual hour"
-    ],
-    "features": [
-      -1.694414748378953,
-      1.9413269010743024,
-      -1.344620215057637,
-      1.0911159664392178,
-      1.8498996086365758,
-      1.1582656456437044,
-      1.1857974380209484,
-      2.96421128578626,
-      -0.4829509408704604,
-      -0.4730514119556008,
-      -0.47398931831843016,
-      -0.466625322474125,
-      12.37000993413366,
-      13.10777830406701,
-      11.496978775765555,
-      13.10777830406701,
-      9.562951072560912,
-      6.962938147078306,
-      -0.07492245467946221,
-      15.367491853657558,
-      14.917944503492771,
-      15.251327163943952,
-      3.2202311064068603,
-      2.8939382582398068,
-      3.177592635934087,
-      -0.17422647440182384,
-      -0.07364742278840125,
-      -0.09706820857443196,
-      -0.08883963325235572,
-      -0.10860215645097263
-    ],
-    "feature_names": [
-      "ProductCD",
-      "card3",
-      "card6",
-      "C7",
-      "C8",
-      "C12",
-      "M6",
-      "V23",
-      "V29",
-      "V30",
-      "V69",
-      "V70",
-      "V108",
-      "V111",
-      "V112",
-      "V113",
-      "V114",
-      "V115",
-      "V117",
-      "V120",
-      "V121",
-      "V122",
-      "V123",
-      "V124",
-      "V125",
-      "V290",
-      "V291",
-      "V292",
-      "V294",
-      "V317"
-    ]
-  },
-  {
-    "id": "txn-2",
-    "title": "High-Risk Transaction #2",
     "amount": "$10.63",
     "time": "4:00 AM \u2022 Weekday",
     "fraud_probability": 1.0,
@@ -86,6 +9,39 @@
     "key_signals": [
       "Transaction at an unusual hour"
     ],
+    "shap_contributions": [
+      {
+        "feature": "C12",
+        "shap_value": 0.5161,
+        "description": "Count of transactions from the same device"
+      },
+      {
+        "feature": "C7",
+        "shap_value": -0.1611,
+        "description": "Number of addresses linked to the payment card"
+      },
+      {
+        "feature": "card6",
+        "shap_value": 0.0795,
+        "description": "Card type (debit vs credit)"
+      },
+      {
+        "feature": "card3",
+        "shap_value": 0.0533,
+        "description": "Card billing country / region code"
+      },
+      {
+        "feature": "V70",
+        "shap_value": 0.0474,
+        "description": "Vesta fraud score (card activity pattern)"
+      },
+      {
+        "feature": "V30",
+        "shap_value": -0.0175,
+        "description": "Vesta fraud score (time pattern)"
+      }
+    ],
+    "shap_base_value": 0.4678,
     "features": [
       -1.694414748378953,
       1.9413269010743024,
@@ -152,6 +108,116 @@
     ]
   },
   {
+    "id": "txn-2",
+    "title": "High-Risk Transaction #2",
+    "amount": "$83.74",
+    "time": "2:00 AM \u2022 Weekday",
+    "fraud_probability": 1.0,
+    "risk_level": "FLAGGED",
+    "key_signals": [
+      "5 different billing addresses on file",
+      "24 transactions linked to this email",
+      "Transaction at an unusual hour"
+    ],
+    "shap_contributions": [
+      {
+        "feature": "V120",
+        "shap_value": 0.3891,
+        "description": "Vesta fraud score (network association)"
+      },
+      {
+        "feature": "V114",
+        "shap_value": -0.2994,
+        "description": "Vesta fraud score (address risk)"
+      },
+      {
+        "feature": "V113",
+        "shap_value": 0.1741,
+        "description": "Vesta fraud score (behavioral cluster)"
+      },
+      {
+        "feature": "C7",
+        "shap_value": -0.158,
+        "description": "Number of addresses linked to the payment card"
+      },
+      {
+        "feature": "C12",
+        "shap_value": 0.1469,
+        "description": "Count of transactions from the same device"
+      },
+      {
+        "feature": "card6",
+        "shap_value": 0.1311,
+        "description": "Card type (debit vs credit)"
+      }
+    ],
+    "shap_base_value": 0.4678,
+    "features": [
+      -1.694414748378953,
+      1.9413269010743024,
+      -1.344620215057637,
+      1.0911159664392178,
+      1.8498996086365758,
+      1.1582656456437044,
+      1.1857974380209484,
+      2.96421128578626,
+      -0.4829509408704604,
+      -0.4730514119556008,
+      -0.47398931831843016,
+      -0.466625322474125,
+      12.37000993413366,
+      13.10777830406701,
+      11.496978775765555,
+      13.10777830406701,
+      9.562951072560912,
+      6.962938147078306,
+      -0.07492245467946221,
+      15.367491853657558,
+      14.917944503492771,
+      15.251327163943952,
+      3.2202311064068603,
+      2.8939382582398068,
+      3.177592635934087,
+      -0.17422647440182384,
+      -0.07364742278840125,
+      -0.09706820857443196,
+      -0.08883963325235572,
+      -0.10860215645097263
+    ],
+    "feature_names": [
+      "ProductCD",
+      "card3",
+      "card6",
+      "C7",
+      "C8",
+      "C12",
+      "M6",
+      "V23",
+      "V29",
+      "V30",
+      "V69",
+      "V70",
+      "V108",
+      "V111",
+      "V112",
+      "V113",
+      "V114",
+      "V115",
+      "V117",
+      "V120",
+      "V121",
+      "V122",
+      "V123",
+      "V124",
+      "V125",
+      "V290",
+      "V291",
+      "V292",
+      "V294",
+      "V317"
+    ]
+  },
+  {
     "id": "txn-3",
     "title": "Legitimate Transaction #3",
     "amount": "$208.43",
@@ -163,6 +229,39 @@
       "Amount within normal range for this card",
       "No unusual behavioral signals detected"
     ],
+    "shap_contributions": [
+      {
+        "feature": "V70",
+        "shap_value": -0.5723,
+        "description": "Vesta fraud score (card activity pattern)"
+      },
+      {
+        "feature": "V69",
+        "shap_value": 0.1841,
+        "description": "Vesta fraud score (device fingerprint)"
+      },
+      {
+        "feature": "V292",
+        "shap_value": -0.038,
+        "description": "Vesta fraud score (payment method risk)"
+      },
+      {
+        "feature": "card6",
+        "shap_value": -0.0341,
+        "description": "Card type (debit vs credit)"
+      },
+      {
+        "feature": "C12",
+        "shap_value": -0.02,
+        "description": "Count of transactions from the same device"
+      },
+      {
+        "feature": "V290",
+        "shap_value": 0.0185,
+        "description": "Vesta fraud score (identity linkage)"
+      }
+    ],
+    "shap_base_value": 0.4678,
     "features": [
       0.6993300448367279,
       -0.4974488997773548,
@@ -231,39 +330,72 @@
   {
     "id": "txn-4",
     "title": "Legitimate Transaction #4",
-    "amount": "$527.00",
-    "time": "3:00 PM \u2022 Weekday",
-    "fraud_probability": 0.0001,
+    "amount": "$442.97",
+    "time": "1:00 PM \u2022 Weekday",
+    "fraud_probability": 0.0002,
     "risk_level": "SAFE",
     "key_signals": [
       "Billing address matches bank records",
       "Amount within normal range for this card",
       "No unusual behavioral signals detected"
     ],
+    "shap_contributions": [
+      {
+        "feature": "V125",
+        "shap_value": -0.3419,
+        "description": "Vesta fraud score (time-of-day risk)"
+      },
+      {
+        "feature": "V70",
+        "shap_value": -0.1832,
+        "description": "Vesta fraud score (card activity pattern)"
+      },
+      {
+        "feature": "V69",
+        "shap_value": 0.1706,
+        "description": "Vesta fraud score (device fingerprint)"
+      },
+      {
+        "feature": "C12",
+        "shap_value": -0.0447,
+        "description": "Count of transactions from the same device"
+      },
+      {
+        "feature": "card6",
+        "shap_value": -0.0312,
+        "description": "Card type (debit vs credit)"
+      },
+      {
+        "feature": "V123",
+        "shap_value": -0.027,
+        "description": "Vesta fraud score (session anomaly)"
+      }
+    ],
+    "shap_base_value": 0.4678,
     "features": [
       0.6993300448367279,
       -0.4974488997773548,
-      -1.344620215057637,
+      0.8163038074626802,
       -0.23848597642289918,
       -0.2314715234478918,
       -0.22711590695058043,
       -1.1893303696558286,
       -0.1869344686056373,
-      -0.4829509408704604,
-      -0.4730514119556008,
-      -0.47398931831843016,
-      -0.466625322474125,
+      1.9417507662183018,
+      1.8076866707253076,
+      1.9603548405545603,
+      1.8563663642702906,
       -0.11139079621500587,
       -0.10861667161452654,
       -0.12466607461626651,
       -0.10861667161452654,
-      9.562951072560912,
-      6.962938147078306,
+      -0.13074733151504997,
+      -0.153455602345777,
       -0.07492245467946221,
       -0.08794844430455943,
       -0.08925166062190974,
       -0.08827409064979605,
-      3.2202311064068603,
+      -0.1832822701928165,
       2.8939382582398068,
       3.177592635934087,
       -0.17422647440182384,
@@ -308,39 +440,72 @@
   {
     "id": "txn-5",
     "title": "Legitimate Transaction #5",
-    "amount": "$442.97",
-    "time": "1:00 PM \u2022 Weekday",
-    "fraud_probability": 0.0003,
+    "amount": "$527.00",
+    "time": "3:00 PM \u2022 Weekday",
+    "fraud_probability": 0.0002,
     "risk_level": "SAFE",
     "key_signals": [
       "Billing address matches bank records",
       "Amount within normal range for this card",
       "No unusual behavioral signals detected"
     ],
+    "shap_contributions": [
+      {
+        "feature": "V114",
+        "shap_value": -0.5998,
+        "description": "Vesta fraud score (address risk)"
+      },
+      {
+        "feature": "V125",
+        "shap_value": -0.333,
+        "description": "Vesta fraud score (time-of-day risk)"
+      },
+      {
+        "feature": "V123",
+        "shap_value": 0.298,
+        "description": "Vesta fraud score (session anomaly)"
+      },
+      {
+        "feature": "V115",
+        "shap_value": 0.0743,
+        "description": "Vesta fraud score (cross-channel activity)"
+      },
+      {
+        "feature": "card6",
+        "shap_value": 0.0695,
+        "description": "Card type (debit vs credit)"
+      },
+      {
+        "feature": "C12",
+        "shap_value": -0.0566,
+        "description": "Count of transactions from the same device"
+      }
+    ],
+    "shap_base_value": 0.4678,
     "features": [
       0.6993300448367279,
       -0.4974488997773548,
-      0.8163038074626802,
+      -1.344620215057637,
       -0.23848597642289918,
       -0.2314715234478918,
       -0.22711590695058043,
       -1.1893303696558286,
       -0.1869344686056373,
-      1.9417507662183018,
-      1.8076866707253076,
-      1.9603548405545603,
-      1.8563663642702906,
+      -0.4829509408704604,
+      -0.4730514119556008,
+      -0.47398931831843016,
+      -0.466625322474125,
       -0.11139079621500587,
       -0.10861667161452654,
       -0.12466607461626651,
       -0.10861667161452654,
-      -0.13074733151504997,
-      -0.153455602345777,
+      9.562951072560912,
+      6.962938147078306,
       -0.07492245467946221,
       -0.08794844430455943,
       -0.08925166062190974,
       -0.08827409064979605,
-      -0.1832822701928165,
+      3.2202311064068603,
       2.8939382582398068,
       3.177592635934087,
       -0.17422647440182384,

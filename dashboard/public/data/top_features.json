@@ -1,107 +1,77 @@
 [
   {
-    "feature": "V292",
-    "coefficient": 10.144,
-    "abs_coef": 10.144,
-    "direction": "\u2191 Increases fraud risk",
-    "description": "Vesta fraud score component (payment method risk)"
+    "feature": "V70",
+    "shap_importance": 0.193,
+    "description": "Vesta fraud score (card activity pattern)"
   },
   {
-    "feature": "V291",
-    "coefficient": -8.5822,
-    "abs_coef": 8.5822,
-    "direction": "\u2193 Decreases fraud risk",
-    "description": "Vesta fraud score component (device consistency)"
+    "feature": "V69",
+    "shap_importance": 0.1308,
+    "description": "Vesta fraud score (device fingerprint)"
+  },
+  {
+    "feature": "card6",
+    "shap_importance": 0.1147,
+    "description": "Card type (debit vs credit)"
+  },
+  {
+    "feature": "V292",
+    "shap_importance": 0.0726,
+    "description": "Vesta fraud score (payment method risk)"
   },
   {
     "feature": "C12",
-    "coefficient": 5.1875,
-    "abs_coef": 5.1875,
-    "direction": "\u2191 Increases fraud risk",
+    "shap_importance": 0.0495,
     "description": "Count of transactions from the same device"
   },
   {
-    "feature": "V70",
-    "coefficient": -2.2011,
-    "abs_coef": 2.2011,
-    "direction": "\u2193 Decreases fraud risk",
-    "description": "Vesta fraud score component (card activity pattern)"
+    "feature": "M6",
+    "shap_importance": 0.041,
+    "description": "Whether the billing address matches the bank record"
+  },
+  {
+    "feature": "V123",
+    "shap_importance": 0.0193,
+    "description": "Vesta fraud score (session anomaly)"
+  },
+  {
+    "feature": "card3",
+    "shap_importance": 0.0187,
+    "description": "Card billing country / region code"
+  },
+  {
+    "feature": "V290",
+    "shap_importance": 0.0165,
+    "description": "Vesta fraud score (identity linkage)"
   },
   {
     "feature": "C7",
-    "coefficient": -2.1174,
-    "abs_coef": 2.1174,
-    "direction": "\u2193 Decreases fraud risk",
+    "shap_importance": 0.016,
     "description": "Number of addresses linked to the payment card"
   },
   {
     "feature": "V125",
-    "coefficient": -2.0906,
-    "abs_coef": 2.0906,
-    "direction": "\u2193 Decreases fraud risk",
-    "description": "Vesta fraud score component (time-of-day risk)"
+    "shap_importance": 0.0144,
+    "description": "Vesta fraud score (time-of-day risk)"
   },
   {
-    "feature": "V123",
-    "coefficient": 2.0464,
-    "abs_coef": 2.0464,
-    "direction": "\u2191 Increases fraud risk",
-    "description": "Vesta fraud score component (session anomaly)"
+    "feature": "V29",
+    "shap_importance": 0.0112,
+    "description": "Vesta fraud score (amount pattern)"
   },
   {
-    "feature": "V69",
-    "coefficient": 1.849,
-    "abs_coef": 1.849,
-    "direction": "\u2191 Increases fraud risk",
-    "description": "Vesta fraud score component (device fingerprint)"
+    "feature": "V291",
+    "shap_importance": 0.0082,
+    "description": "Vesta fraud score (device consistency)"
   },
   {
     "feature": "V114",
-    "coefficient": -1.2243,
-    "abs_coef": 1.2243,
-    "direction": "\u2193 Decreases fraud risk",
-    "description": "Vesta fraud score component (address risk)"
-  },
-  {
-    "feature": "V120",
-    "coefficient": 1.1418,
-    "abs_coef": 1.1418,
-    "direction": "\u2191 Increases fraud risk",
-    "description": "Vesta fraud score component (network association)"
-  },
-  {
-    "feature": "V290",
-    "coefficient": -0.8938,
-    "abs_coef": 0.8938,
-    "direction": "\u2193 Decreases fraud risk",
-    "description": "Vesta fraud score component (identity linkage)"
-  },
-  {
-    "feature": "card6",
-    "coefficient": -0.7388,
-    "abs_coef": 0.7388,
-    "direction": "\u2193 Decreases fraud risk",
-    "description": "Card type (debit vs credit)"
-  },
-  {
-    "feature": "V294",
-    "coefficient": -0.6243,
-    "abs_coef": 0.6243,
-    "direction": "\u2193 Decreases fraud risk",
-    "description": "Vesta fraud score component (transaction sequence)"
+    "shap_importance": 0.0047,
+    "description": "Vesta fraud score (address risk)"
   },
   {
     "feature": "V317",
-    "coefficient": 0.4984,
-    "abs_coef": 0.4984,
-    "direction": "\u2191 Increases fraud risk",
-    "description": "Vesta fraud score component (high-risk merchant type)"
-  },
-  {
-    "feature": "V122",
-    "coefficient": 0.472,
-    "abs_coef": 0.472,
-    "direction": "\u2191 Increases fraud risk",
-    "description": "Vesta fraud score component (card not present risk)"
+    "shap_importance": 0.0039,
+    "description": "Vesta fraud score (high-risk merchant type)"
   }
 ]
