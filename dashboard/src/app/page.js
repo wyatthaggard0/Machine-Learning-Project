@@ -36,53 +36,36 @@ function Stat({ label, value, sub, accent = "text-[#1a1f2e]" }) {
 
 function ShapBeeswarm({ features }) {
   const max = Math.max(...features.map(f => f.importance ?? 0), 0.0001)
+  const POS = "#ff2d75"   // pink, matches the local SHAP plot
+
   return (
-    <div className="space-y-1.5">
-      <div className="grid grid-cols-[80px_1fr_70px] items-center gap-3 text-[10px] uppercase tracking-wider text-[#9ca3af] pb-2 border-b border-[#eef0f3]">
-        <span className="text-right">Feature</span>
-        <span>Impact on prediction</span>
-        <span className="text-right">Mean |SHAP|</span>
-      </div>
+    <div className="space-y-2.5">
       {features.map(f => {
-        const center = (f.importance ?? 0) / max
-        const dots = Array.from({ length: 24 }, (_, i) => {
-          const t = (i / 23) * 2 - 1
-          const xPct = Math.max(0, Math.min(1, center * (0.6 + Math.abs(t) * 0.4)))
-          const yJitter = ((i * 37) % 13) / 13 - 0.5
-          const colorT = i / 23
-          const r = Math.round(67  + (220 - 67)  * colorT)
-          const g = Math.round(146 + (38  - 146) * colorT)
-          const b = Math.round(241 + (38  - 241) * colorT)
-          return { xPct, yJitter, color: `rgb(${r},${g},${b})` }
-        })
+        const width = ((f.importance ?? 0) / max) * 100
         return (
-          <div key={f.feature} className="grid grid-cols-[80px_1fr_70px] items-center gap-3">
-            <div className="text-right text-[12px] font-medium text-[#1a1f2e]">{f.feature}</div>
-            <div className="relative h-7 bg-[#f7f8fa] rounded">
-              <div className="absolute left-0 top-0 bottom-0 w-px bg-[#e5e7eb]" />
-              {dots.map((d, i) => (
-                <div key={i} className="absolute w-2 h-2 rounded-full"
-                  style={{
-                    left:  `calc(${d.xPct * 100}% - 4px)`,
-                    top:   `calc(50% + ${d.yJitter * 14}px - 4px)`,
-                    background: d.color,
-                    opacity: 0.85,
-                  }}
-                />
-              ))}
+          <div
+            key={f.feature}
+            className="grid grid-cols-[80px_1fr_70px] items-center gap-3 group"
+            title={`${f.feature} — ${f.description ?? ""}`}
+          >
+            <div className="text-right text-[11px] text-[#9ca3af] font-mono group-hover:text-[#1a1f2e] transition-colors">
+              {f.feature}
             </div>
-            <div className="text-[11px] tabular-nums text-[#6b7280] text-right">
+            <div className="relative h-7">
+              <div
+                className="absolute top-0 bottom-0 left-0 rounded-sm transition-opacity opacity-95 group-hover:opacity-100"
+                style={{
+                  width:      `${width}%`,
+                  background: POS,
+                }}
+              />
+            </div>
+            <div className="text-[11px] tabular-nums text-right font-medium" style={{ color: POS }}>
               {Number(f.importance ?? 0).toFixed(4)}
             </div>
           </div>
         )
       })}
-      <div className="flex items-center justify-end gap-2 pt-3 mt-2 border-t border-[#eef0f3]">
-        <span className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Feature value:</span>
-        <span className="text-[10px] text-[#6b7280]">low</span>
-        <div className="w-32 h-2 rounded-sm" style={{ background: "linear-gradient(to right, #4392f1, #dc2626)" }} />
-        <span className="text-[10px] text-[#6b7280]">high</span>
-      </div>
     </div>
   )
 }
