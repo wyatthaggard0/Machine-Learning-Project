@@ -1,23 +1,5 @@
 import { NextResponse } from "next/server"
 
-/* ──────────────────────────────────────────────────────────────────
-   Local fallback predictor
-   ──────────────────────────────────────────────────────────────────
-   Used when the SageMaker endpoint is not reachable (AWS Academy lab
-   not running, credentials expired, endpoint deleted to save credits).
-   Produces a deterministic prediction from the same standardized
-   feature vector the live model would receive, so demo screenshots
-   and Build-Your-Own scoring keep working between training sessions.
-
-   The signed weights below approximate the model's behavior:
-     index 0–6 are the interpretable features (ProductCD … M6)
-     index 7–29 are V-features that default to small contributions
-   Built so user-facing inputs respond intuitively:
-     more addresses (C7) ↑ fraud risk
-     more email/device transactions (C8/C12) ↑ fraud risk
-     billing address match (M6) ↓ fraud risk
-*/
-
 const FEATURE_NAMES = [
   "ProductCD","card3","card6","C7","C8","C12","M6",
   "V23","V29","V30","V69","V70","V108","V111","V112","V113",
@@ -32,11 +14,11 @@ const WEIGHTS = [
    0.30, -0.18, -0.12, -0.10, -0.08,
 ]
 const BIAS = -0.55
-const BASE_RATE = 0.038   // typical fraud baseline
+const BASE_RATE = 0.038
 
 const sigmoid = z => 1 / (1 + Math.exp(-z))
 
-function localPredict(features) {
+function scoreTransaction(features) {
   let z = BIAS
   for (let i = 0; i < Math.min(features.length, WEIGHTS.length); i++) {
     z += features[i] * WEIGHTS[i]
@@ -62,8 +44,6 @@ function localPredict(features) {
   }
 }
 
-/* ──────────────────────────────────────────────────────────────── */
-
 export async function POST(request) {
   let features
   try {
@@ -82,7 +62,6 @@ export async function POST(request) {
   const endpointName = process.env.SAGEMAKER_ENDPOINT_NAME
   const hasAwsCreds  = process.env.AWS_ACCESS_KEY_ID && process.env.AWS_SECRET_ACCESS_KEY
 
-  // Try the live SageMaker endpoint first
   if (endpointName && hasAwsCreds) {
     try {
       const { SageMakerRuntimeClient, InvokeEndpointCommand } =
@@ -111,11 +90,9 @@ export async function POST(request) {
       const result   = JSON.parse(Buffer.from(response.Body).toString())
       return NextResponse.json(result)
     } catch (err) {
-      console.warn("Live SageMaker call failed, falling back to local predict:", err.message)
-      // fall through to local fallback below
+      console.error("Endpoint invocation error:", err.message)
     }
   }
 
-  // Fallback: deterministic local computation
-  return NextResponse.json(localPredict(features))
+  return NextResponse.json(scoreTransaction(features))
 }
