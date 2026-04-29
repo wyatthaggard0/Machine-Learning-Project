@@ -39,6 +39,28 @@ except ImportError:
     print("⚠  xgboost not installed — using GradientBoostingClassifier instead")
     from sklearn.ensemble import GradientBoostingClassifier
 
+
+# ── SHAP shape helpers ─────────────────────────────────────────────────
+# SHAP's TreeExplainer returns different shapes across versions:
+#   - older: list of 2 arrays  [class_0, class_1]   each (n, n_features)
+#   - newer: ndarray (n, n_features, 2)  for binary classifiers
+#   - or:    ndarray (n, n_features)     already-class-1
+# These helpers normalize all of those to a class-1 ndarray.
+
+def _flatten_shap(sv):
+    if isinstance(sv, list):
+        sv = sv[1] if len(sv) > 1 else sv[0]
+    sv = np.asarray(sv)
+    if sv.ndim == 3:
+        return sv[..., -1]    # (n, n_features, n_classes) → class 1
+    return sv
+
+def _flatten_base(base):
+    if isinstance(base, (list, np.ndarray)):
+        arr = np.atleast_1d(np.asarray(base, dtype=float))
+        return float(arr[-1] if arr.size > 1 else arr[0])
+    return float(base)
+
 print("=" * 70)
 print("  MILESTONE 4 — RUBRIC COMPLETION")
 print("=" * 70)
@@ -206,22 +228,15 @@ print("\n[§4.7] Computing SHAP values …")
 # Tree models get TreeExplainer; otherwise KernelExplainer on a sample
 if best_name in ('XGBoost', 'RandomForest'):
     explainer = shap.TreeExplainer(tuned_model)
-    shap_values_full = explainer.shap_values(X_test_std)
-    if isinstance(shap_values_full, list):
-        shap_values_full = shap_values_full[1]
-    expected_value = explainer.expected_value
-    if isinstance(expected_value, (list, np.ndarray)):
-        expected_value = expected_value[1] if len(np.atleast_1d(expected_value)) > 1 else float(expected_value)
+    shap_values_full = _flatten_shap(explainer.shap_values(X_test_std))
 else:
     background = shap.sample(X_train_std, 100, random_state=42)
     explainer  = shap.KernelExplainer(tuned_model.predict_proba, background)
     sample_n   = min(200, len(X_test_std))
-    shap_values_full = explainer.shap_values(X_test_std[:sample_n], nsamples=100)
-    if isinstance(shap_values_full, list):
-        shap_values_full = shap_values_full[1]
-    expected_value = explainer.expected_value
-    if isinstance(expected_value, (list, np.ndarray)):
-        expected_value = expected_value[1]
+    shap_values_full = _flatten_shap(
+        explainer.shap_values(X_test_std[:sample_n], nsamples=100)
+    )
+expected_value = _flatten_base(explainer.expected_value)
 
 # Global SHAP summary (beeswarm)
 print("  Global SHAP summary plot …")
@@ -259,13 +274,14 @@ print(f"    test idx={best_legit_idx}, predicted fraud probability={test_proba[b
 
 for label, idx in [('FRAUD', best_fraud_idx), ('LEGITIMATE', best_legit_idx)]:
     if best_name in ('XGBoost', 'RandomForest'):
-        sv = explainer.shap_values(X_test_std[idx:idx+1])
-        if isinstance(sv, list):
-            sv = sv[1]
-        sv_row = sv[0]
+        sv_row = _flatten_shap(explainer.shap_values(X_test_std[idx:idx+1]))[0]
     else:
-        sv_row = shap_values_full[idx] if idx < len(shap_values_full) else \
-                 explainer.shap_values(X_test_std[idx:idx+1], nsamples=100)[1][0]
+        if idx < len(shap_values_full):
+            sv_row = shap_values_full[idx]
+        else:
+            sv_row = _flatten_shap(
+                explainer.shap_values(X_test_std[idx:idx+1], nsamples=100)
+            )[0]
 
     fig = plt.figure(figsize=(10, 6))
     shap.waterfall_plot(
@@ -399,13 +415,14 @@ for i, (idx, (risk, title_prefix)) in enumerate(
 
     # Local SHAP values
     if best_name in ('XGBoost', 'RandomForest'):
-        local_sv = explainer.shap_values(X_test_std[idx:idx+1])
-        if isinstance(local_sv, list):
-            local_sv = local_sv[1]
-        local_sv = local_sv[0]
+        local_sv = _flatten_shap(explainer.shap_values(X_test_std[idx:idx+1]))[0]
     else:
-        local_sv = shap_values_full[idx] if idx < len(shap_values_full) else \
-                   explainer.shap_values(X_test_std[idx:idx+1], nsamples=100)[1][0]
+        if idx < len(shap_values_full):
+            local_sv = shap_values_full[idx]
+        else:
+            local_sv = _flatten_shap(
+                explainer.shap_values(X_test_std[idx:idx+1], nsamples=100)
+            )[0]
 
     # Top 6 contributing features (by absolute value)
     contrib_order = np.argsort(np.abs(local_sv))[::-1][:6]
