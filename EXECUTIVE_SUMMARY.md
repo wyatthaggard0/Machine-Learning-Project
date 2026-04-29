@@ -18,28 +18,30 @@ The objective of this project was to train a machine-learning model on the IEEE-
 
 ## 2. Business-Relevant Results
 
-The final tuned model was evaluated on a held-out test set of **2,000 transactions** never seen during training. Results at the chosen operating threshold of **0.436**:
+The final tuned model was evaluated on a held-out test set of **2,000 transactions** never seen during training. Results at the chosen operating threshold of **0.50**:
 
 | Metric | Value | Interpretation |
 |---|---|---|
 | **ROC-AUC** | **0.81** | Model accuracy at ranking fraud above legitimate (1.00 = perfect, 0.50 = random). |
-| **Recall (fraud catch rate)** | **73.6%** | Share of actual fraud transactions the model successfully flagged. |
-| **Precision** | **7.0%** | Of everything the model flagged, this share were actually fraud. |
-| **F1** | **12.9%** | Harmonic mean of precision and recall — sensitive to the precision shortfall. |
-| **Balanced Accuracy** | **73.6%** | Average accuracy across fraud and legitimate classes. |
-| **MCC** | **0.17** | Matthews correlation — modest signal above random under heavy imbalance. |
-| **Loss prevented** | **$6,494.84** | Dollar value of fraud caught in the test sample (39 fraud transactions). |
-| **Loss missed** | **$2,595.62** | Dollar value of fraud the model failed to catch (14 transactions). |
-| **False alarm value** | **$74,941.55** | Legitimate transactions incorrectly blocked (515 transactions). |
+| **Recall (fraud catch rate)** | **67.9%** | Share of actual fraud transactions the model successfully flagged. |
+| **Precision** | **6.9%** | Of everything the model flagged, this share were actually fraud. |
+| **F1** | **12.5%** | Harmonic mean of precision and recall — sensitive to the precision shortfall. |
+| **Balanced Accuracy** | **71.5%** | Average accuracy across fraud and legitimate classes. |
+| **MCC** | **0.16** | Matthews correlation — modest signal above random under heavy imbalance. |
+| **Loss prevented** | **$5,763.84** | Dollar value of fraud caught in the test sample (36 fraud transactions). |
+| **Loss missed** | **$3,326.62** | Dollar value of fraud the model failed to catch (17 transactions). |
+| **False alarm value** | **$68,370.41** | Legitimate transactions incorrectly blocked (485 transactions). |
 | **Total fraud in sample** | **$9,090.46** | 53 fraudulent transactions, 2.65% of test set. |
 
-**Headline finding:** the model recovers **71.4%** of fraud dollars in the held-out sample. However, it does so by flagging a high volume of legitimate transactions — at this threshold the false-alarm cost ($74,941) substantially exceeds the loss prevented ($6,495). The model's high recall and modest AUC make it a solid first-pass screen, but the operating threshold needs to be revisited before any production deployment.
+**Headline finding:** the model recovers **63.4%** of fraud dollars in the held-out sample. However, it does so by flagging a high volume of legitimate transactions — at this threshold the false-alarm cost ($68,370) substantially exceeds the loss prevented ($5,764). The model's solid recall and respectable AUC make it a viable first-pass screen, but the operating threshold needs to be revisited before any production deployment.
+
+**Generalization note:** train and test ROC-AUC are 0.811 and 0.815 respectively — a train-test gap of essentially zero (slightly negative). This indicates the model is not overfitting; performance on truly new transactions should track close to the test-set numbers above.
 
 ## 3. How the Model Is Used in Production
 
 ```
 Customer initiates transaction → Features extracted (amount, card metadata,
-behavioral signals) → Model scores 0–100% fraud probability → Score ≥ 0.436:
+behavioral signals) → Model scores 0–100% fraud probability → Score ≥ 0.50:
 flagged for analyst review or decline / Below: approve.
 ```
 
@@ -61,18 +63,18 @@ Each prediction in the live dashboard ships with a **per-feature SHAP bar chart*
 
 ## 5. Business Impact
 
-- **Direct savings.** In the test sample, the model recovered **$6,494** of fraud — 71% of the dollar value at risk. Catching fraud before settlement eliminates chargeback fees, customer reimbursements, and downstream investigation cost.
+- **Direct savings.** In the test sample, the model recovered **$5,764** of fraud — 63% of the dollar value at risk. Catching fraud before settlement eliminates chargeback fees, customer reimbursements, and downstream investigation cost.
 - **Customer trust.** Proactive fraud prevention is a competitive differentiator for card issuers. Even an imperfect model materially reduces the surface area of successful fraud.
 - **Operational scaling.** Automating the first-pass fraud screen lets human analysts focus on the borderline cases the model flags for review, rather than wading through every transaction.
 - **Regulatory alignment.** SHAP explanations satisfy "right-to-explanation" requirements under emerging AI-governance regulations; every flagged transaction comes with an auditable per-feature contribution breakdown.
 
-The current threshold is calibrated for high recall, which is appropriate for a fraud-detection prototype but generates a high volume of false alarms. Before production deployment, the threshold should be raised (or a cost-sensitive learning approach adopted) so that the dollar value of false alarms is contained relative to the dollar value of fraud caught.
+The current threshold prioritizes recall, which is appropriate for a fraud-detection prototype but generates a high volume of false alarms. Before production deployment, the threshold should be raised (or a cost-sensitive learning approach adopted) so that the dollar value of false alarms is contained relative to the dollar value of fraud caught.
 
 ## 6. Risks and Limitations
 
 | # | Risk | Impact |
 |---|---|---|
-| **1. Low precision at current threshold** | Of every 100 transactions flagged, only ~7 are actually fraud. The model blocked **$74,941** of legitimate transaction value to save **$6,495** of fraud — a ~12× imbalance. | Customer friction, manual-review backlog, lost revenue. The threshold should be raised to ~0.6–0.7 to bring the false-alarm cost in line with fraud caught. |
+| **1. Low precision at current threshold** | Of every 100 transactions flagged, only ~7 are actually fraud. The model blocked **$68,370** of legitimate transaction value to save **$5,764** of fraud — a ~12× imbalance. | Customer friction, manual-review backlog, lost revenue. The threshold should be raised toward 0.65–0.70 to bring the false-alarm cost in line with fraud caught. |
 | **2. Modest AUC** | Test ROC-AUC of 0.81 is below the typical IEEE-CIS benchmark (0.92–0.96) achieved with gradient-boosted trees on the full dataset. | Indicates room to improve signal extraction. |
 | **3. Static threshold drift** | Threshold was tuned once; fraud patterns shift seasonally and with new attack types. | Performance degrades over time without periodic re-calibration. |
 | **4. Masked / proprietary features** | Most predictive columns (V1–V339) are anonymized Vesta scores with no public definition. | Reduces auditability; harder to validate fairness. |
@@ -82,7 +84,7 @@ The current threshold is calibrated for high recall, which is appropriate for a 
 ## 7. Recommendations to Executives
 
 **Short term (0–3 months):**
-1. **Raise the decision threshold from 0.436 to ~0.65** before any production deployment. This will reduce recall modestly but should cut false-alarm value by an order of magnitude — a much more defensible operating point.
+1. **Raise the decision threshold from 0.50 to ~0.65** before any production deployment. This will reduce recall modestly but should cut false-alarm value by an order of magnitude — a much more defensible operating point.
 2. **Deploy in shadow mode.** Score live transactions but do not act on the predictions. Compare the model's decisions to the existing rule-based system and quantify lift before turning on enforcement.
 
 **Medium term (3–9 months):**
@@ -98,9 +100,10 @@ The current threshold is calibrated for high recall, which is appropriate for a 
 
 ## Appendix: Project Artifacts
 
-- **Notebook:** `Project-Wyatt1.1.ipynb` — full training pipeline, model comparison, SHAP analysis
+- **Notebook:** `FinalizedProject-Wyatt.ipynb` — full training pipeline, model comparison, SHAP analysis
 - **Saved pipeline:** `pipeline_finetuned.joblib` — production-ready scikit-learn pipeline
 - **SHAP explainer:** `shap_explainer.joblib` — for downstream local explanation in production
+- **Final algorithm:** Tuned Logistic Regression (winner of 4-model bake-off vs. RandomForest, XGBoost, GaussianNB)
 - **AWS endpoint:** `fraud-detection-endpoint` (SageMaker, region us-east-1)
 - **Dashboard:** Vercel-hosted banker demonstration UI
 - **GitHub repo:** github.com/wyatthaggard0/Machine-Learning-Project
