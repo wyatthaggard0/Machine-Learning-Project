@@ -298,9 +298,24 @@ for label, idx in [('FRAUD', best_fraud_idx), ('LEGITIMATE', best_legit_idx)]:
     plt.tight_layout()
     plt.show()
 
-# Save the SHAP explainer
-joblib.dump(explainer, "shap_explainer.joblib")
-print("\n✓ shap_explainer.joblib saved")
+# Save the SHAP explainer.
+# Tree-based explainers contain Cython memoryviews that don't always pickle
+# cleanly (known SHAP/joblib issue). Fall back to a metadata wrapper that
+# inference.py can use to recreate a fresh explainer from the saved model.
+try:
+    joblib.dump(explainer, "shap_explainer.joblib")
+    print("\n✓ shap_explainer.joblib saved")
+except Exception as e:
+    print(f"\n⚠  Could not pickle TreeExplainer directly ({type(e).__name__}: {e})")
+    print("   Saving lightweight wrapper — endpoint will rebuild from the model.")
+    explainer_meta = {
+        "is_metadata_wrapper": True,
+        "explainer_type":      "TreeExplainer" if best_name in ('XGBoost', 'RandomForest') else "KernelExplainer",
+        "expected_value":      float(expected_value),
+        "feature_names":       list(feature_names),
+    }
+    joblib.dump(explainer_meta, "shap_explainer.joblib")
+    print("   ✓ shap_explainer.joblib saved (metadata wrapper)")
 
 # ──────────────────────────────────────────────────────────────────────
 # §4.8 — Update dashboard JSONs

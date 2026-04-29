@@ -6,11 +6,19 @@ import numpy as np
 
 def model_fn(model_dir):
     artifacts = joblib.load(os.path.join(model_dir, "pipeline.joblib"))
-    # Try to load SHAP explainer (optional)
     explainer_path = os.path.join(model_dir, "shap_explainer.joblib")
     if os.path.exists(explainer_path):
         try:
-            artifacts["explainer"] = joblib.load(explainer_path)
+            data = joblib.load(explainer_path)
+            # If saved as metadata wrapper, rebuild the explainer from the model
+            if isinstance(data, dict) and data.get("is_metadata_wrapper"):
+                try:
+                    import shap
+                    artifacts["explainer"] = shap.TreeExplainer(artifacts["model"])
+                except Exception as e:
+                    print(f"Could not rebuild TreeExplainer: {e}")
+            else:
+                artifacts["explainer"] = data
         except Exception as e:
             print(f"Could not load shap_explainer: {e}")
     return artifacts
