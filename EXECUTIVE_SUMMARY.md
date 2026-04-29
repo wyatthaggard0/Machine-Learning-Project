@@ -35,6 +35,8 @@ The final tuned model was evaluated on a held-out test set of **2,000 transactio
 
 **Headline finding:** the model recovers **71.4%** of fraud dollars in the held-out sample. However, it does so by flagging a high volume of legitimate transactions — at this threshold the false-alarm cost ($74,941) substantially exceeds the loss prevented ($6,495). The model's high recall and modest AUC make it a solid first-pass screen, but the operating threshold needs to be revisited before any production deployment.
 
+**Generalization check:** train AUC is **0.852** vs test AUC of **0.810**, a gap of **4.2 percentage points**. This is within the healthy range for a regularized linear model with SMOTE balancing — the model is learning real signal rather than memorizing the training set, and performance on truly new transactions should track close to the test-set numbers above.
+
 ## 3. How the Model Is Used in Production
 
 ```
