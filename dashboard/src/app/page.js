@@ -88,73 +88,71 @@ function ShapBeeswarm({ features }) {
 }
 
 function ShapForcePlot({ contributions, baseValue, finalValue }) {
-  const sorted = [...contributions].sort((a, b) => Math.abs(b.shap_value) - Math.abs(a.shap_value))
+  const sorted = [...contributions].sort(
+    (a, b) => Math.abs(b.shap_value) - Math.abs(a.shap_value)
+  )
   const maxAbs = Math.max(...sorted.map(c => Math.abs(c.shap_value)), 0.0001)
-  const total  = sorted.reduce((s, c) => s + Math.abs(c.shap_value), 0)
-  let cursor = 0
+
+  // Classic SHAP colors
+  const POS = "#ff2d75"   // pink — pushes toward fraud
+  const NEG = "#1e88e5"   // blue — pushes away from fraud
 
   return (
     <div>
-      {/* Stacked force bar */}
-      <div className="relative h-10 rounded overflow-hidden border border-[#e5e7eb] mb-2">
-        {sorted.map((c, i) => {
-          const width = (Math.abs(c.shap_value) / total) * 100
-          const left  = cursor
-          cursor += width
-          const isPos = c.shap_value > 0
-          return (
-            <div key={i}
-              className="absolute top-0 bottom-0 flex items-center justify-center"
-              style={{
-                left:  `${left}%`, width: `${width}%`,
-                background: isPos ? "#dc2626" : "#2563eb",
-                borderRight: i < sorted.length - 1 ? "1px solid white" : "none",
-              }}
-              title={`${c.feature}: ${isPos ? "+" : ""}${c.shap_value.toFixed(4)}`}
-            >
-              {width > 6 && (
-                <span className="text-[9px] font-medium text-white truncate px-1">{c.feature}</span>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      <div className="flex justify-between text-[11px] mb-5">
+      {/* Base → Final summary */}
+      <div className="flex justify-between text-[11px] mb-4">
         <div>
           <div className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Base value</div>
-          <div className="font-medium text-[#1a1f2e] tabular-nums">{(baseValue * 100).toFixed(2)}%</div>
+          <div className="font-medium text-[#1a1f2e] tabular-nums">
+            {(baseValue * 100).toFixed(2)}%
+          </div>
         </div>
         <div className="text-right">
           <div className="text-[10px] uppercase tracking-wider text-[#9ca3af]">Final prediction</div>
-          <div className="font-semibold text-[#dc2626] tabular-nums">{(finalValue * 100).toFixed(2)}%</div>
+          <div className="font-semibold tabular-nums" style={{ color: POS }}>
+            {(finalValue * 100).toFixed(2)}%
+          </div>
         </div>
       </div>
 
-      {/* Per-feature centered bars */}
-      <div className="space-y-1.5">
-        {sorted.map((c, i) => {
-          const isPos = c.shap_value > 0
-          const width = (Math.abs(c.shap_value) / maxAbs) * 50
-          return (
-            <div key={i} className="grid grid-cols-[80px_1fr_70px] items-center gap-3">
-              <div className="text-right text-[12px] font-medium text-[#1a1f2e]">{c.feature}</div>
-              <div className="relative h-5 bg-[#f7f8fa] rounded">
-                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#e5e7eb]" />
-                <div className="absolute top-0 bottom-0 rounded-sm"
-                  style={{
-                    left:  isPos ? "50%" : `${50 - width}%`,
-                    width: `${width}%`,
-                    background: isPos ? "#dc2626" : "#2563eb",
-                  }}
-                />
+      {/* Centered SHAP bars sorted by magnitude — pure visualization */}
+      <div className="relative py-1">
+        {/* Vertical zero axis line spanning the full plot */}
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-[#d4d7de]" />
+
+        <div className="space-y-2.5">
+          {sorted.map((c, i) => {
+            const isPos = c.shap_value > 0
+            const width = (Math.abs(c.shap_value) / maxAbs) * 48 // half-width %
+            return (
+              <div
+                key={i}
+                className="grid grid-cols-[80px_1fr_70px] items-center gap-3 group"
+                title={`${c.feature}: ${isPos ? "+" : ""}${c.shap_value.toFixed(4)} — ${c.description ?? ""}`}
+              >
+                <div className="text-right text-[11px] text-[#9ca3af] font-mono group-hover:text-[#1a1f2e] transition-colors">
+                  {c.feature}
+                </div>
+                <div className="relative h-7">
+                  <div
+                    className="absolute top-0 bottom-0 rounded-sm transition-opacity group-hover:opacity-100 opacity-95"
+                    style={{
+                      left:       isPos ? "50%" : `${50 - width}%`,
+                      width:      `${width}%`,
+                      background: isPos ? POS : NEG,
+                    }}
+                  />
+                </div>
+                <div
+                  className="text-[11px] tabular-nums text-right font-medium"
+                  style={{ color: isPos ? POS : NEG }}
+                >
+                  {isPos ? "+" : ""}{c.shap_value.toFixed(4)}
+                </div>
               </div>
-              <div className={`text-[11px] tabular-nums text-right font-medium ${isPos ? "text-[#dc2626]" : "text-[#2563eb]"}`}>
-                {isPos ? "+" : ""}{c.shap_value.toFixed(4)}
-              </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
     </div>
   )
@@ -405,8 +403,8 @@ function BuildYourOwn({ scalerStats, onResult }) {
           <div className="flex items-baseline justify-between mb-4">
             <h4 className="text-[13px] font-semibold text-[#1a1f2e]">SHAP — Why this score?</h4>
             <span className="text-[11px] text-[#6b7280]">
-              <span className="text-[#dc2626]">Red</span> = pushes toward fraud,
-              <span className="text-[#2563eb]"> blue</span> = away
+              <span style={{ color: "#ff2d75" }}>Pink</span> = pushes toward fraud,
+              <span style={{ color: "#1e88e5" }}> blue</span> = away
             </span>
           </div>
           <ShapForcePlot
