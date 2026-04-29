@@ -16,5 +16,8 @@
   "n_fraud_missed": 14,
   "n_false_alarms": 515,
   "n_test": 2000,
-  "fraud_rate_pct": 2.65
+  "fraud_rate_pct": 2.65,
+  "train_auc": 0.8521,
+  "test_auc": 0.81,
+  "train_test_gap": 0.0421
 }
